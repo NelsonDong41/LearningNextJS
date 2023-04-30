@@ -1,4 +1,6 @@
-import MeetupList from '../components/meetups/MeetupList';
+import { load } from "webfontloader";
+import MeetupList from "../components/meetups/MeetupList";
+import { useState, useEffect } from "react";
 
 const DUMMY_DATA = [
   {
@@ -22,10 +24,46 @@ const DUMMY_DATA = [
 ];
 
 function AllMeetupsPage() {
+  const [isLoading, setisLoading] = useState(true);
+  const [loadedMeetups, setLoadedMeetups] = useState([]);
+
+  useEffect(() => {
+    setisLoading(true);
+    fetch(
+      "https://react-getting-started-bd016-default-rtdb.firebaseio.com/meetups.json"
+    )
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        const meetups = [];
+
+        for(const key in data) {
+          const meetup = {
+            id:key,
+            ...data[key]
+          };
+
+          meetups.push(meetup);
+        }
+
+        setisLoading(false);
+        setLoadedMeetups(meetups);
+      });
+  }, []);
+
+  if (isLoading) {
+    return (
+      <section>
+        <p>Loading...</p>
+      </section>
+    );
+  }
+
   return (
     <section>
       <h1>All Meetups</h1>
-      <MeetupList meetups={DUMMY_DATA}/>
+      <MeetupList meetups={loadedMeetups} />
     </section>
   );
 }
