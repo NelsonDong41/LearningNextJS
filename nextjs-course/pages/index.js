@@ -1,14 +1,25 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
+import { getFeaturedEvents } from "../helpers/api-utils";
+import EventList from "../components/events/event-list";
 
-const inter = Inter({ subsets: ['latin'] })
-
-export default function Home() {
+function HomePage(props) {
   return (
-    <div className={styles.container}>
-      <h1>Hello Next World!</h1>
+    <div>
+      <EventList items = {props.events} />
     </div>
-  )
+  );
 }
+
+
+export async function getStaticProps() {
+
+  const featuredEvents = await getFeaturedEvents();
+  return {
+    props: {
+      events: featuredEvents
+    },
+    revalidate: 1800
+  }
+}
+
+
+export default HomePage;
